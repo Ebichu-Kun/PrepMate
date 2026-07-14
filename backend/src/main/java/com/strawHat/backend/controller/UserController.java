@@ -22,6 +22,8 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponseDto>> register(@Valid @RequestBody RegisterRequestDto request) {
 
+        System.out.println("Controller hit");
+
         UserResponseDto response = userService.register(request);
 
         ApiResponse<UserResponseDto> apiResponse =
