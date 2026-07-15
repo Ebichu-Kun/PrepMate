@@ -1,8 +1,6 @@
 package com.strawHat.backend.controller;
 
-import com.strawHat.backend.dto.ApiResponse;
-import com.strawHat.backend.dto.RegisterRequestDto;
-import com.strawHat.backend.dto.UserResponseDto;
+import com.strawHat.backend.dto.*;
 import com.strawHat.backend.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,7 +20,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponseDto>> register(@Valid @RequestBody RegisterRequestDto request) {
 
-        System.out.println("Controller hit");
+//        System.out.println("Controller hit");
 
         UserResponseDto response = userService.register(request);
 
@@ -35,5 +33,21 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(apiResponse);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponseDto>> login(
+            @Valid @RequestBody LoginRequestDto request) {
+
+        LoginResponseDto response = userService.login(request);
+
+        ApiResponse<LoginResponseDto> apiResponse =
+                new ApiResponse<>(
+                        true,
+                        "Login Successful",
+                        response
+                );
+
+        return ResponseEntity.ok(apiResponse);
     }
 }

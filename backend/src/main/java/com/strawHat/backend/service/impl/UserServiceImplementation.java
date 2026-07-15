@@ -1,8 +1,12 @@
 package com.strawHat.backend.service.impl;
 
+import com.strawHat.backend.dto.LoginRequestDto;
+import com.strawHat.backend.dto.LoginResponseDto;
 import com.strawHat.backend.dto.RegisterRequestDto;
 import com.strawHat.backend.dto.UserResponseDto;
 import com.strawHat.backend.entity.User;
+import com.strawHat.backend.exception.EmailAlreadyExistException;
+import com.strawHat.backend.exception.InvalidCredentialsException;
 import com.strawHat.backend.repository.UserRepository;
 import com.strawHat.backend.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +31,7 @@ public class UserServiceImplementation implements UserService {
 
         if(userRepository.existsByEmail(request.getEmail()))
         {
-            throw new RuntimeException("Email already exists");
+            throw new EmailAlreadyExistException("Email already exists");
         }
 
         User user = new User();
@@ -47,5 +51,21 @@ public class UserServiceImplementation implements UserService {
         return response;
     }
 
+    @Override
+    public LoginResponseDto login(LoginRequestDto request) {
 
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new InvalidCredentialsException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+
+        return new LoginResponseDto(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+    }
 }
