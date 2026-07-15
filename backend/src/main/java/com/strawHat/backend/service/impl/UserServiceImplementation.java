@@ -8,6 +8,7 @@ import com.strawHat.backend.entity.User;
 import com.strawHat.backend.exception.EmailAlreadyExistException;
 import com.strawHat.backend.exception.InvalidCredentialsException;
 import com.strawHat.backend.repository.UserRepository;
+import com.strawHat.backend.security.JwtService;
 import com.strawHat.backend.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,14 @@ import org.springframework.stereotype.Service;
 public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
 
-    public UserServiceImplementation(UserRepository userRepository , PasswordEncoder passwordEncoder)
+    public UserServiceImplementation(UserRepository userRepository , PasswordEncoder passwordEncoder , JwtService jwtService)
     {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
 
@@ -62,10 +65,17 @@ public class UserServiceImplementation implements UserService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
+        String token = jwtService.generateToken(user);
+
+        UserResponseDto userResponse = new UserResponseDto();
+
+        userResponse.setId(user.getId());
+        userResponse.setName(user.getName());
+        userResponse.setEmail(user.getEmail());
+
         return new LoginResponseDto(
-                user.getId(),
-                user.getName(),
-                user.getEmail()
+                token,
+                userResponse
         );
     }
 }
