@@ -60,4 +60,74 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(response);
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUserNotFoundException(
+            UserNotFoundException ex) {
+
+        ApiResponse<Void> response = new ApiResponse<>(
+                false,
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
+    @ExceptionHandler(NoteNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoteNotFoundException(
+            NoteNotFoundException ex) {
+
+        ApiResponse<Void> response = new ApiResponse<>(
+                false,
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnauthorizedAccessException(
+            UnauthorizedAccessException ex) {
+
+        ApiResponse<Void> response = new ApiResponse<>(
+                false,
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+
+    @ExceptionHandler(InterviewSessionNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInterviewSessionNotFoundException(
+            InterviewSessionNotFoundException ex) {
+
+        ApiResponse<Void> response = new ApiResponse<>(
+                false,
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
+    @ExceptionHandler(InterviewQuestionNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInterviewQuestionNotFoundException(
+            InterviewQuestionNotFoundException ex) {
+
+        ApiResponse<Void> response = new ApiResponse<>(
+                false,
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
 }
