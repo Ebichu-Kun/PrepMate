@@ -24,4 +24,7 @@ public class InterviewResultResponseDto {
     private List<String> weaknesses;
 
     private List<String> suggestions;
+
+    private List<QuestionFeedbackDto> questionFeedback;
+    
 }

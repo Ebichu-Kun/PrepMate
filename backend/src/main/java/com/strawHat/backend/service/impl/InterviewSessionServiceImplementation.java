@@ -140,10 +140,10 @@ public class InterviewSessionServiceImplementation implements InterviewSessionSe
 
     @Override
     public StartInterviewResponseDto startInterview(InterviewSessionRequestDto request) {
+
         User currentUser = getCurrentUser();
 
         InterviewSession session = new InterviewSession();
-
         session.setRole(request.getRole());
         session.setDifficulty(request.getDifficulty());
         session.setUser(currentUser);
@@ -151,23 +151,21 @@ public class InterviewSessionServiceImplementation implements InterviewSessionSe
         InterviewSession savedSession =
                 interviewSessionRepository.save(session);
 
-        List<String> generatedQuestions =
+        List<InterviewQuestionResponseDto> generatedQuestions =
                 questionGeneratorService.generateQuestions(
                         request.getRole(),
                         request.getDifficulty(),
                         request.getNumberOfQuestions()
                 );
+
         List<InterviewQuestion> questions = new ArrayList<>();
 
-        int order = 1;
+        for (InterviewQuestionResponseDto dto : generatedQuestions) {
 
-        for (String questionText : generatedQuestions) {
+            InterviewQuestion question = new InterviewQuestion();
 
-            InterviewQuestion question =
-                    new InterviewQuestion();
-
-            question.setQuestion(questionText);
-            question.setQuestionOrder(order++);
+            question.setQuestion(dto.getQuestion());
+            question.setQuestionOrder(dto.getQuestionOrder());
             question.setInterviewSession(savedSession);
 
             questions.add(question);
@@ -177,13 +175,13 @@ public class InterviewSessionServiceImplementation implements InterviewSessionSe
 
         List<InterviewQuestionResponseDto> questionDtos =
                 questions.stream()
-                        .map(question ->
-                                new InterviewQuestionResponseDto(
-                                        question.getId(),
-                                        question.getQuestion(),
-                                        question.getQuestionOrder()
-                                ))
+                        .map(question -> new InterviewQuestionResponseDto(
+                                question.getId(),
+                                question.getQuestion(),
+                                question.getQuestionOrder()
+                        ))
                         .toList();
+
         return new StartInterviewResponseDto(
                 savedSession.getId(),
                 questionDtos
@@ -245,24 +243,12 @@ public class InterviewSessionServiceImplementation implements InterviewSessionSe
             throw new UnauthorizedAccessException(
                     "You are not allowed to access this interview");
         }
+
         List<InterviewQuestion> questions =
                 interviewQuestionRepository
                         .findByInterviewSessionIdOrderByQuestionOrderAsc(
                                 sessionId
                         );
-        boolean completed = questions.stream()
-                .allMatch(question ->
-                        question.getAnswer() != null &&
-                                !question.getAnswer().isBlank());
-
-
-        session.setScore(85);
-
-        session.setFeedback(
-                "Good understanding of Java and Spring Boot."
-        );
-
-        interviewSessionRepository.save(session);
 
         InterviewResultResponseDto response =
                 interviewEvaluationService.evaluate(questions);
@@ -273,7 +259,6 @@ public class InterviewSessionServiceImplementation implements InterviewSessionSe
         interviewSessionRepository.save(session);
 
         return response;
-
     }
 
 }
