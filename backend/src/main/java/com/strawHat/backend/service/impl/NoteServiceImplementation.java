@@ -10,19 +10,12 @@ import com.strawHat.backend.exception.UserNotFoundException;
 import com.strawHat.backend.repository.NoteRepository;
 import com.strawHat.backend.repository.UserRepository;
 import com.strawHat.backend.service.NoteService;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
@@ -61,7 +54,7 @@ public class NoteServiceImplementation implements NoteService {
         response.setContent(savedNote.getContent());
         response.setCreatedAt(savedNote.getCreatedAt());
         response.setUpdatedAt(savedNote.getUpdatedAt());
-        response.setFileName(savedNote.getFileName());
+
         return response;
     }
 
@@ -86,7 +79,7 @@ public class NoteServiceImplementation implements NoteService {
                     response.setContent(note.getContent());
                     response.setCreatedAt(note.getCreatedAt());
                     response.setUpdatedAt(note.getUpdatedAt());
-                    response.setFileName(note.getFileName());
+
                     return response;
                 })
                 .toList();
@@ -121,7 +114,6 @@ public class NoteServiceImplementation implements NoteService {
         response.setContent(updatedNote.getContent());
         response.setCreatedAt(updatedNote.getCreatedAt());
         response.setUpdatedAt(updatedNote.getUpdatedAt());
-        response.setFileName(updatedNote.getFileName());
 
         return response;
     }
@@ -144,9 +136,7 @@ public class NoteServiceImplementation implements NoteService {
                     "You are not allowed to delete this note"
             );
         }
-        Path path = Paths.get(note.getFilePath());
 
-        Files.deleteIfExists(path);
         noteRepository.delete(note);
     }
 
@@ -173,7 +163,7 @@ public class NoteServiceImplementation implements NoteService {
         dto.setTitle(note.getTitle());
         dto.setUpdatedAt(note.getUpdatedAt());
         dto.setCreatedAt(note.getCreatedAt());
-        dto.setFileName(note.getFileName());
+
         return dto;
     }
 
@@ -188,35 +178,18 @@ public class NoteServiceImplementation implements NoteService {
                 );
 
         return notes.stream().map(note -> new NoteResponseDto(
-                note.getId(), note.getTitle(), note.getContent(), note.getCreatedAt() , note.getUpdatedAt() , note.getFileName()
+                note.getId(), note.getTitle(), note.getContent(), note.getCreatedAt() , note.getUpdatedAt()
         )).toList();
     }
 
     @Override
     public NoteResponseDto uploadNote(
             String title,
-            String content,
-            MultipartFile file) throws IOException {
+            String content
+            ) {
 
         User currentUser = getCurrentUser();
 
-        String fileName =
-                System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
-        Path uploadPath = Paths.get("uploads/notes");
-
-        if (!Files.exists(uploadPath)) {
-
-            Files.createDirectories(uploadPath);
-
-        }
-        Path filePath = uploadPath.resolve(fileName);
-
-        Files.copy(
-                file.getInputStream(),
-                filePath,
-                StandardCopyOption.REPLACE_EXISTING
-        );
 
         Note note = new Note();
 
@@ -224,8 +197,7 @@ public class NoteServiceImplementation implements NoteService {
         note.setContent(content);
         note.setUser(currentUser);
 
-        note.setFileName(fileName);
-        note.setFilePath(filePath.toString());
+
 
         Note savedNote = noteRepository.save(note);
 
@@ -236,26 +208,7 @@ public class NoteServiceImplementation implements NoteService {
         response.setContent(savedNote.getContent());
         response.setCreatedAt(savedNote.getCreatedAt());
         response.setUpdatedAt(savedNote.getUpdatedAt());
-        response.setFileName(savedNote.getFileName());
         return response;
     }
 
-    @Override
-    public Resource downloadNote(Long id) throws MalformedURLException {
-
-        User currentUser = getCurrentUser();
-
-        Note note = noteRepository
-                .findByIdAndUser(id, currentUser)
-                .orElseThrow(() ->
-                        new NoteNotFoundException("Note not found"));
-        Path path = Paths.get(note.getFilePath());
-
-        Resource resource = new UrlResource(path.toUri());
-        if (!resource.exists()) {
-            throw new NoteNotFoundException("File not found");
-        }
-
-        return resource;
-    }
 }

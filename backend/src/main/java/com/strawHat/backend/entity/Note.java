@@ -29,9 +29,7 @@ public class Note {
 
     private LocalDateTime updatedAt;
 
-    private String fileName;
 
-    private String filePath;
 
     @PrePersist
     public void prePersist() {

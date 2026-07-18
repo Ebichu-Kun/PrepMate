@@ -15,13 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
 public class NoteController {
+
     private final NoteService noteService;
 
     public NoteController(NoteService noteService) {
@@ -125,40 +124,6 @@ public class NoteController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<NoteResponseDto>> uploadNote(
-            @RequestParam String title,
-            @RequestParam String content,
-            @RequestParam MultipartFile file) throws IOException {
 
-        NoteResponseDto response =
-                noteService.uploadNote(title, content, file);
 
-        ApiResponse<NoteResponseDto> apiResponse =
-                new ApiResponse<>(
-                        true,
-                        "Note uploaded successfully",
-                        response
-                );
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(apiResponse);
-    }
-
-    @GetMapping("/{id}/download")
-    public ResponseEntity<Resource> downloadNote(
-            @PathVariable Long id) throws MalformedURLException {
-
-        Resource resource = noteService.downloadNote(id);
-
-        return ResponseEntity.ok()
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" +
-                                resource.getFilename() +
-                                "\""
-                )
-                .body(resource);
-    }
 }

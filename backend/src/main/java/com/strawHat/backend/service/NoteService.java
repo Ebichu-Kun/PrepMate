@@ -25,9 +25,8 @@ public interface NoteService {
 
     NoteResponseDto uploadNote(
             String title,
-            String content,
-            MultipartFile file
-    ) throws IOException;
+            String content
+    );
 
-    Resource downloadNote(Long id) throws MalformedURLException;
+
 }

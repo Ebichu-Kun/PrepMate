@@ -130,4 +130,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(response);
     }
+
+    @ExceptionHandler(DSAProblemNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDSAProblemNotFoundException(
+            DSAProblemNotFoundException ex) {
+
+        ApiResponse<Void> response = new ApiResponse<>(
+                false,
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
 }

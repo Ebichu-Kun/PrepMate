@@ -1,7 +1,5 @@
 package com.strawHat.backend.controller;
 
-
-
 import com.strawHat.backend.service.ai.AIService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

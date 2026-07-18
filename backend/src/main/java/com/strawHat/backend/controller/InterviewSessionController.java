@@ -24,11 +24,9 @@ public class InterviewSessionController {
     public ResponseEntity<ApiResponse<InterviewSessionResponseDto>> createInterview(
             @RequestBody @Valid InterviewSessionRequestDto request) {
 
-        InterviewSessionResponseDto response =
-                interviewSessionService.createInterview(request);
+        InterviewSessionResponseDto response = interviewSessionService.createInterview(request);
 
-        ApiResponse<InterviewSessionResponseDto> apiResponse =
-                new ApiResponse<>(
+        ApiResponse<InterviewSessionResponseDto> apiResponse = new ApiResponse<>(
                         true,
                         "Interview session created successfully",
                         response
@@ -43,8 +41,7 @@ public class InterviewSessionController {
     public ResponseEntity<ApiResponse<StartInterviewResponseDto>> startInterview(
             @Valid @RequestBody InterviewSessionRequestDto request) {
 
-        StartInterviewResponseDto response =
-                interviewSessionService.startInterview(request);
+        StartInterviewResponseDto response = interviewSessionService.startInterview(request);
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
@@ -58,8 +55,7 @@ public class InterviewSessionController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<InterviewSessionResponseDto>>> getAllInterviews() {
 
-        List<InterviewSessionResponseDto> response =
-                interviewSessionService.getAllInterviews();
+        List<InterviewSessionResponseDto> response = interviewSessionService.getAllInterviews();
 
         ApiResponse<List<InterviewSessionResponseDto>> apiResponse =
                 new ApiResponse<>(
@@ -75,8 +71,7 @@ public class InterviewSessionController {
     public ResponseEntity<ApiResponse<InterviewSessionResponseDto>> getInterviewById(
             @PathVariable Long id) {
 
-        InterviewSessionResponseDto response =
-                interviewSessionService.getInterviewById(id);
+        InterviewSessionResponseDto response = interviewSessionService.getInterviewById(id);
 
         ApiResponse<InterviewSessionResponseDto> apiResponse =
                 new ApiResponse<>(
@@ -126,8 +121,7 @@ public class InterviewSessionController {
     finishInterview(
             @PathVariable Long sessionId) {
 
-        InterviewResultResponseDto response =
-                interviewSessionService.finishInterview(sessionId);
+        InterviewResultResponseDto response = interviewSessionService.finishInterview(sessionId);
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
