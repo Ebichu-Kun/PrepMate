@@ -9,11 +9,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a mock interview session belonging to a
+ */
 @Entity
 @Table(name = "interview_sessions")
 @Getter
 @Setter
 public class InterviewSession {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,11 +36,6 @@ public class InterviewSession {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
-    }
-
     @JsonManagedReference
     @OneToMany(
             mappedBy = "interviewSession",
@@ -44,4 +43,12 @@ public class InterviewSession {
             orphanRemoval = true
     )
     private List<InterviewQuestion> questions = new ArrayList<>();
+
+    /**
+     * Sets the creation timestamp before the entity is first persisted.
+     */
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }

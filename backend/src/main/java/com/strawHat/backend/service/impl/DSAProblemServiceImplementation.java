@@ -17,6 +17,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Handles CRUD and search operations for DSA problems, always scoping
+ * access to the currently authenticated user.
+ */
 @Service
 public class DSAProblemServiceImplementation implements DSAProblemService {
 
@@ -31,33 +35,25 @@ public class DSAProblemServiceImplementation implements DSAProblemService {
         this.userRepository = userRepository;
     }
 
+    /** Resolves the currently authenticated user from the security context. */
     private User getCurrentUser() {
 
         Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
+                SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null ||
-                !authentication.isAuthenticated()) {
-
-            throw new UserNotFoundException(
-                    "Authenticated user not found"
-            );
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UserNotFoundException("Authenticated user not found");
         }
 
         String email = authentication.getName();
 
         return userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found"
-                        ));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
+    /** Creates a new DSA problem for the current user. */
     @Override
-    public DSAProblemResponseDto createProblem(
-            DSAProblemRequestDto request) {
+    public DSAProblemResponseDto createProblem(DSAProblemRequestDto request) {
 
         User currentUser = getCurrentUser();
 
@@ -67,12 +63,12 @@ public class DSAProblemServiceImplementation implements DSAProblemService {
 
         problem.setUser(currentUser);
 
-        DSAProblem savedProblem =
-                dsaProblemRepository.save(problem);
+        DSAProblem savedProblem = dsaProblemRepository.save(problem);
 
         return mapToResponseDto(savedProblem);
     }
 
+    /** Returns all DSA problems belonging to the current user, newest first. */
     @Override
     public List<DSAProblemResponseDto> getAllProblems() {
 
@@ -85,126 +81,105 @@ public class DSAProblemServiceImplementation implements DSAProblemService {
                 .toList();
     }
 
+    /** Returns a single DSA problem, provided it belongs to the current user. */
     @Override
     public DSAProblemResponseDto getProblemById(Long id) {
 
         User currentUser = getCurrentUser();
 
-        DSAProblem problem =
-                findProblemByIdAndUser(id, currentUser);
+        DSAProblem problem = findProblemByIdAndUser(id, currentUser);
 
         return mapToResponseDto(problem);
     }
 
+    /** Updates an existing DSA problem, provided it belongs to the current user. */
     @Override
-    public DSAProblemResponseDto updateProblem(
-            Long id,
-            DSAProblemRequestDto request) {
+    public DSAProblemResponseDto updateProblem(Long id, DSAProblemRequestDto request) {
 
         User currentUser = getCurrentUser();
 
-        DSAProblem problem =
-                findProblemByIdAndUser(id, currentUser);
+        DSAProblem problem = findProblemByIdAndUser(id, currentUser);
 
         updateEntity(problem, request, false);
 
-        DSAProblem updatedProblem =
-                dsaProblemRepository.save(problem);
+        DSAProblem updatedProblem = dsaProblemRepository.save(problem);
 
         return mapToResponseDto(updatedProblem);
     }
 
+    /** Deletes a DSA problem, provided it belongs to the current user. */
     @Override
     public void deleteProblem(Long id) {
 
         User currentUser = getCurrentUser();
 
-        DSAProblem problem =
-                findProblemByIdAndUser(id, currentUser);
+        DSAProblem problem = findProblemByIdAndUser(id, currentUser);
 
         dsaProblemRepository.delete(problem);
     }
 
+    /** Returns the current user's DSA problems filtered by status, newest first. */
     @Override
-    public List<DSAProblemResponseDto> getProblemsByStatus(
-            ProblemStatus status) {
+    public List<DSAProblemResponseDto> getProblemsByStatus(ProblemStatus status) {
 
         User currentUser = getCurrentUser();
 
         return dsaProblemRepository
-                .findByUserAndStatusOrderByCreatedAtDesc(
-                        currentUser,
-                        status
-                )
+                .findByUserAndStatusOrderByCreatedAtDesc(currentUser, status)
                 .stream()
                 .map(this::mapToResponseDto)
                 .toList();
     }
 
+    /** Returns the current user's DSA problems filtered by difficulty, newest first. */
     @Override
-    public List<DSAProblemResponseDto> getProblemsByDifficulty(
-            ProblemDifficulty difficulty) {
+    public List<DSAProblemResponseDto> getProblemsByDifficulty(ProblemDifficulty difficulty) {
 
         User currentUser = getCurrentUser();
 
         return dsaProblemRepository
-                .findByUserAndDifficultyOrderByCreatedAtDesc(
-                        currentUser,
-                        difficulty
-                )
+                .findByUserAndDifficultyOrderByCreatedAtDesc(currentUser, difficulty)
                 .stream()
                 .map(this::mapToResponseDto)
                 .toList();
     }
 
+    /** Searches the current user's DSA problems by title keyword, newest first. */
     @Override
-    public List<DSAProblemResponseDto> searchByTitle(
-            String title) {
+    public List<DSAProblemResponseDto> searchByTitle(String title) {
 
         User currentUser = getCurrentUser();
 
         return dsaProblemRepository
-                .findByUserAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(
-                        currentUser,
-                        title
-                )
+                .findByUserAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(currentUser, title)
                 .stream()
                 .map(this::mapToResponseDto)
                 .toList();
     }
 
+    /** Searches the current user's DSA problems by topic keyword, newest first. */
     @Override
-    public List<DSAProblemResponseDto> searchByTopic(
-            String topic) {
+    public List<DSAProblemResponseDto> searchByTopic(String topic) {
 
         User currentUser = getCurrentUser();
 
         return dsaProblemRepository
-                .findByUserAndTopicContainingIgnoreCaseOrderByCreatedAtDesc(
-                        currentUser,
-                        topic
-                )
+                .findByUserAndTopicContainingIgnoreCaseOrderByCreatedAtDesc(currentUser, topic)
                 .stream()
                 .map(this::mapToResponseDto)
                 .toList();
     }
 
-    private DSAProblem findProblemByIdAndUser(
-            Long id,
-            User user) {
+    /** Finds a DSA problem by id, throwing if it doesn't exist or isn't owned by the user. */
+    private DSAProblem findProblemByIdAndUser(Long id, User user) {
 
         return dsaProblemRepository
                 .findByIdAndUser(id, user)
-                .orElseThrow(() ->
-                        new DSAProblemNotFoundException(
-                                "DSA problem not found"
-                        ));
+                .orElseThrow(() -> new DSAProblemNotFoundException("DSA problem not found"));
     }
 
-    private void updateEntity(
-            DSAProblem problem,
-            DSAProblemRequestDto request,
-            boolean creating) {
+    /** Copies request fields onto the entity, applying defaults when creating a new problem. */
+    private void updateEntity(DSAProblem problem, DSAProblemRequestDto request, boolean creating) {
 
         problem.setTitle(request.getTitle().trim());
         problem.setTopic(request.getTopic().trim());
@@ -216,19 +191,12 @@ public class DSAProblemServiceImplementation implements DSAProblemService {
             problem.setStatus(ProblemStatus.NOT_STARTED);
         }
 
-        problem.setPlatform(
-                normalizeText(request.getPlatform())
-        );
-
-        problem.setProblemUrl(
-                normalizeText(request.getProblemUrl())
-        );
-
-        problem.setNotes(
-                normalizeText(request.getNotes())
-        );
+        problem.setPlatform(normalizeText(request.getPlatform()));
+        problem.setProblemUrl(normalizeText(request.getProblemUrl()));
+        problem.setNotes(normalizeText(request.getNotes()));
     }
 
+    /** Trims a string, converting blank input to null so optional fields stay unset. */
     private String normalizeText(String value) {
 
         if (value == null || value.isBlank()) {
@@ -238,8 +206,8 @@ public class DSAProblemServiceImplementation implements DSAProblemService {
         return value.trim();
     }
 
-    private DSAProblemResponseDto mapToResponseDto(
-            DSAProblem problem) {
+    /** Maps a DSAProblem entity to its response DTO. */
+    private DSAProblemResponseDto mapToResponseDto(DSAProblem problem) {
 
         return new DSAProblemResponseDto(
                 problem.getId(),

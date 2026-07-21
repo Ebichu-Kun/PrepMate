@@ -5,10 +5,9 @@ import com.strawHat.backend.entity.InterviewQuestion;
 
 import java.util.List;
 
+/** Evaluates a completed interview's questions/answers using AI and produces a scored result. */
 public interface InterviewEvaluationService {
 
-    InterviewResultResponseDto evaluate(
-            List<InterviewQuestion> questions
-    );
-
+    /** Evaluates the given answered questions and returns an overall scored result. */
+    InterviewResultResponseDto evaluate(List<InterviewQuestion> questions);
 }

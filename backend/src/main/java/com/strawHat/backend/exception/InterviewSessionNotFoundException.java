@@ -1,8 +1,8 @@
 package com.strawHat.backend.exception;
 
-public class InterviewSessionNotFoundException extends RuntimeException{
-    public InterviewSessionNotFoundException(String msg)
-    {
-        super(msg);
+/** Thrown when a requested interview session does not exist or does not belong to the current user. */
+public class InterviewSessionNotFoundException extends RuntimeException {
+    public InterviewSessionNotFoundException(String message) {
+        super(message);
     }
 }

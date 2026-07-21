@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Uses the configured AI provider to evaluate a completed interview's
+ * answers, producing an overall score plus per-question feedback.
+ */
 @Service
-public class InterviewEvaluationServiceImpl
-        implements InterviewEvaluationService {
+public class InterviewEvaluationServiceImpl implements InterviewEvaluationService {
 
     private final AIService aiService;
     private final ObjectMapper objectMapper;
@@ -28,9 +31,39 @@ public class InterviewEvaluationServiceImpl
         this.interviewQuestionRepository = interviewQuestionRepository;
     }
 
+    /**
+     * Builds an evaluation prompt from the given questions/answers, sends it
+     * to the AI provider, parses the JSON response, persists per-question
+     * scores/feedback, and returns the overall result.
+     */
     @Override
-    public InterviewResultResponseDto evaluate(
-            List<InterviewQuestion> questions) {
+    public InterviewResultResponseDto evaluate(List<InterviewQuestion> questions) {
+
+        String prompt = buildEvaluationPrompt(questions);
+
+        String response = aiService.generateContent(prompt)
+                .replace("```json", "")
+                .replace("```", "")
+                .trim();
+
+        try {
+            InterviewResultResponseDto result =
+                    objectMapper.readValue(response, InterviewResultResponseDto.class);
+
+            applyFeedbackToQuestions(questions, result);
+
+            return result;
+
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Unable to parse AI response.\nAI Response:\n" + response,
+                    e
+            );
+        }
+    }
+
+    /** Builds the instruction + question/answer transcript sent to the AI evaluator. */
+    private String buildEvaluationPrompt(List<InterviewQuestion> questions) {
 
         StringBuilder prompt = new StringBuilder();
 
@@ -85,48 +118,27 @@ public class InterviewEvaluationServiceImpl
                     .append("\n\n");
         }
 
-        String response = aiService.generateContent(prompt.toString());
+        return prompt.toString();
+    }
 
-        response = response
-                .replace("```json", "")
-                .replace("```", "")
-                .trim();
+    /** Copies the AI's per-question score/feedback back onto the question entities and saves them. */
+    private void applyFeedbackToQuestions(List<InterviewQuestion> questions,
+                                           InterviewResultResponseDto result) {
 
-        try {
-
-            InterviewResultResponseDto result =
-                    objectMapper.readValue(
-                            response,
-                            InterviewResultResponseDto.class
-                    );
-
-            if (result.getQuestionFeedback() != null) {
-
-                result.getQuestionFeedback().forEach(feedback -> {
-
-                    questions.stream()
-                            .filter(question ->
-                                    question.getQuestionOrder()
-                                            .equals(feedback.getQuestionOrder()))
-                            .findFirst()
-                            .ifPresent(question -> {
-                                question.setScore(feedback.getScore());
-                                question.setAiFeedback(feedback.getFeedback());
-                            });
-
-                });
-
-                interviewQuestionRepository.saveAll(questions);
-            }
-
-            return result;
-
-        } catch (Exception e) {
-
-            throw new RuntimeException(
-                    "Unable to parse AI response.\nAI Response:\n" + response,
-                    e
-            );
+        if (result.getQuestionFeedback() == null) {
+            return;
         }
+
+        result.getQuestionFeedback().forEach(feedback ->
+                questions.stream()
+                        .filter(question ->
+                                question.getQuestionOrder().equals(feedback.getQuestionOrder()))
+                        .findFirst()
+                        .ifPresent(question -> {
+                            question.setScore(feedback.getScore());
+                            question.setAiFeedback(feedback.getFeedback());
+                        }));
+
+        interviewQuestionRepository.saveAll(questions);
     }
 }

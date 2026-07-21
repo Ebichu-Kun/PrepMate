@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Request body for creating or updating a DSA problem. */
 @Getter
 @Setter
 public class DSAProblemRequestDto {

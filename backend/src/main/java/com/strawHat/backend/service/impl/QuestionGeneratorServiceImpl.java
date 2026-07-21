@@ -8,9 +8,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Generates interview questions by prompting the AI provider and parsing
+ * its plain-text, one-question-per-line response.
+ */
 @Service
-public class QuestionGeneratorServiceImpl
-        implements QuestionGeneratorService {
+public class QuestionGeneratorServiceImpl implements QuestionGeneratorService {
 
     private final AIService aiService;
 
@@ -18,6 +21,10 @@ public class QuestionGeneratorServiceImpl
         this.aiService = aiService;
     }
 
+    /**
+     * Builds a prompt asking for the requested number of questions, sends it
+     * to the AI provider, and parses the response into ordered question DTOs.
+     */
     @Override
     public List<InterviewQuestionResponseDto> generateQuestions(
             String role,
@@ -35,11 +42,7 @@ public class QuestionGeneratorServiceImpl
             - No numbering
             - No bullet points
             - No explanations
-            """.formatted(
-                numberOfQuestions,
-                role,
-                difficulty
-        );
+            """.formatted(numberOfQuestions, role, difficulty);
 
         String response = aiService.generateContent(prompt);
 
@@ -56,7 +59,7 @@ public class QuestionGeneratorServiceImpl
                     .replaceFirst("^-\\s*", "");
 
             if (!line.isBlank()) {
-                questions.add(new InterviewQuestionResponseDto(id, line , (int) id));
+                questions.add(new InterviewQuestionResponseDto(id, line, (int) id));
                 id++;
             }
         }

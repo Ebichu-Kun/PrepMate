@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Request body for registering a new user account. */
 @Getter
 @Setter
 public class RegisterRequestDto {

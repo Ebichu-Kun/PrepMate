@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Response body representing a single interview question sent to the client. */
 @Getter
 @Setter
 @AllArgsConstructor

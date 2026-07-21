@@ -13,27 +13,33 @@ import com.strawHat.backend.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Handles user registration and login, including password hashing and
+ * JWT issuance.
+ */
 @Service
 public class UserServiceImplementation implements UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-
-    public UserServiceImplementation(UserRepository userRepository , PasswordEncoder passwordEncoder , JwtService jwtService)
-    {
+    public UserServiceImplementation(UserRepository userRepository,
+                                      PasswordEncoder passwordEncoder,
+                                      JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
 
-
-
+    /**
+     * Registers a new user after checking the email isn't already taken,
+     * hashing the password before saving.
+     */
     @Override
     public UserResponseDto register(RegisterRequestDto request) {
 
-        if(userRepository.existsByEmail(request.getEmail()))
-        {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistException("Email already exists");
         }
 
@@ -54,6 +60,10 @@ public class UserServiceImplementation implements UserService {
         return response;
     }
 
+    /**
+     * Verifies the given credentials against the stored user and, if valid,
+     * issues a new JWT.
+     */
     @Override
     public LoginResponseDto login(LoginRequestDto request) {
 
@@ -73,9 +83,6 @@ public class UserServiceImplementation implements UserService {
         userResponse.setName(user.getName());
         userResponse.setEmail(user.getEmail());
 
-        return new LoginResponseDto(
-                token,
-                userResponse
-        );
+        return new LoginResponseDto(token, userResponse);
     }
 }

@@ -5,14 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
+/**
+ * Data access for {@link InterviewQuestion} entities.
+ */
 @Repository
 public interface InterviewQuestionRepository
         extends JpaRepository<InterviewQuestion, Long> {
+
+    /** Returns all questions for a session, ordered by their position in the interview. */
     List<InterviewQuestion> findByInterviewSessionIdOrderByQuestionOrderAsc(Long interviewSessionId);
-    Optional<InterviewQuestion> findByIdAndInterviewSessionId(
-            Long questionId,
-            Long interviewSessionId
-    );
 }

@@ -1,8 +1,7 @@
 package com.strawHat.backend.exception;
 
-public class InterviewQuestionNotFoundException
-        extends RuntimeException {
-
+/** Thrown when a requested interview question does not exist. */
+public class InterviewQuestionNotFoundException extends RuntimeException {
     public InterviewQuestionNotFoundException(String message) {
         super(message);
     }

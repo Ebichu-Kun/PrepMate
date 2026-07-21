@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * A single question (and the candidate's answer/AI feedback)
+ */
 @Entity
 @Table(name = "interview_questions")
 @Getter
@@ -27,7 +30,6 @@ public class InterviewQuestion {
     private Integer score;
 
     private Integer questionOrder;
-
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)

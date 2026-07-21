@@ -1,11 +1,11 @@
 package com.strawHat.backend.dto;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Request body for creating or starting an interview session. */
 @Getter
 @Setter
 public class InterviewSessionRequestDto {

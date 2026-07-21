@@ -9,6 +9,10 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a single DSA  practice problem
+ * tracked by a user, including its difficulty, solve status, and notes.
+ */
 @Entity
 @Table(name = "dsa_problems")
 @Getter
@@ -50,6 +54,10 @@ public class DSAProblem {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /**
+     * Sets the creation timestamp and default status/solvedAt values before
+     * the entity is first persisted.
+     */
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
@@ -63,6 +71,10 @@ public class DSAProblem {
         }
     }
 
+    /**
+     * Keeps solvedAt in sync with status on every update: sets it when the
+     * problem becomes SOLVED, and clears it otherwise.
+     */
     @PreUpdate
     public void preUpdate() {
         if (status == ProblemStatus.SOLVED && solvedAt == null) {

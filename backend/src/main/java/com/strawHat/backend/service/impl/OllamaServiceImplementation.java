@@ -1,6 +1,5 @@
 package com.strawHat.backend.service.impl;
 
-
 import com.strawHat.backend.dto.ollama.OllamaRequest;
 import com.strawHat.backend.dto.ollama.OllamaResponse;
 import com.strawHat.backend.service.ai.AIService;
@@ -8,6 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+/**
+ * {@link AIService} implementation backed by a locally running Ollama
+ * instance.
+ */
 @Service
 public class OllamaServiceImplementation implements AIService {
 
@@ -23,11 +26,11 @@ public class OllamaServiceImplementation implements AIService {
         this.webClient = webClient;
     }
 
+    /** Sends the prompt to Ollama's /api/generate endpoint and returns the generated text. */
     @Override
     public String generateContent(String prompt) {
 
-        OllamaRequest request =
-                new OllamaRequest(model, prompt, false);
+        OllamaRequest request = new OllamaRequest(model, prompt, false);
 
         OllamaResponse response = webClient.post()
                 .uri(url)

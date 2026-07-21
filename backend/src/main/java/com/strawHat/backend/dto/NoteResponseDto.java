@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/** Response body representing a note returned to the client. */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,5 +18,4 @@ public class NoteResponseDto {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

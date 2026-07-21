@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/**
+ * A free-form note created by a user for personal study/reference.
+ */
 @Entity
 @Table(name = "notes")
 @Getter
@@ -29,14 +32,18 @@ public class Note {
 
     private LocalDateTime updatedAt;
 
-
-
+    /**
+     * Sets both createdAt and updatedAt before the entity is first persisted.
+     */
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
+    /**
+     * Refreshes updatedAt whenever the entity is modified.
+     */
     @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();

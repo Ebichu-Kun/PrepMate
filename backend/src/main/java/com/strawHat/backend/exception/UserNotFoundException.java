@@ -1,8 +1,8 @@
 package com.strawHat.backend.exception;
 
-public class UserNotFoundException extends RuntimeException{
-    public UserNotFoundException(String msg)
-    {
-        super(msg);
+/** Thrown when a user cannot be found (e.g. by id or from the security context). */
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
+        super(message);
     }
 }

@@ -1,8 +1,8 @@
 package com.strawHat.backend.exception;
 
-public class NoteNotFoundException extends RuntimeException{
-    public NoteNotFoundException(String msg)
-    {
-        super(msg);
+/** Thrown when a requested note does not exist or does not belong to the current user. */
+public class NoteNotFoundException extends RuntimeException {
+    public NoteNotFoundException(String message) {
+        super(message);
     }
 }
