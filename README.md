@@ -68,13 +68,6 @@ Configure the following properties before starting the application.
 
 ---
 
-## Running the Application
-
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-
 The application will start on:
 
 ```
